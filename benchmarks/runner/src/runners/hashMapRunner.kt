@@ -12,7 +12,7 @@ import runBenchmarks
 
 fun main() {
     runBenchmarks(hashMapOutputFileName) { this
-            .include("immutableMap")
+            .include("immutableMap\\.PutAll")
             .exclude("builder")
             .param(implementationParam, "hash")
     }

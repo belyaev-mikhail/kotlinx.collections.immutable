@@ -39,7 +39,7 @@ const val implementationParam = "implementation"
 const val immutablePercentageParam = "immutablePercentage"
 
 
-val jvmArgs = arrayOf("-Xms2048m", "-Xmx2048m")
+val jvmArgs = arrayOf("-Xms8G", "-Xmx8G")
 
 const val forks = 1
 const val warmupIterations = 10
@@ -47,6 +47,6 @@ const val measurementIterations = 20
 val warmupTime = TimeValue.milliseconds(500)!!
 val measurementTime = TimeValue.milliseconds(1000)!!
 
-val sizeParamValues = arrayOf("1", "10", "100", "1000", "10000", "100000", "1000000")
+val sizeParamValues = arrayOf("1", "10", "100", "1000", "10000", "100000", "1000000", "10000000")
 val hashCodeTypeParamValues = arrayOf("ascending", "random", "collision", "nonExisting")
 val immutablePercentageParamValues = arrayOf("0.0", "20.0", "50.0", "90.0")

@@ -85,7 +85,7 @@ internal class PersistentHashSetBuilder<E>(private var set: PersistentHashSet<E>
         if (set !== null) {
             val counter = DeltaCounter()
             val size = this.size
-            val result = node.mutableRemoveAll(set.node, 0, counter, this)
+            val result = node.removeAll(set.node, 0, counter, this)
 
             when (val newSize = size - counter.count) {
                 0 -> clear()

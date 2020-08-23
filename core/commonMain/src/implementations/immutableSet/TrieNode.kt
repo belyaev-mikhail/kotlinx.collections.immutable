@@ -333,9 +333,9 @@ internal class TrieNode<E>(
         }
     }
 
-    private fun mutableCollisionRemoveAll(otherNode: TrieNode<E>,
-                                          intersectionSizeRef: DeltaCounter,
-                                          owner: MutabilityOwnership): Any? {
+    private fun collisionRemoveAll(otherNode: TrieNode<E>,
+                                   intersectionSizeRef: DeltaCounter,
+                                   owner: MutabilityOwnership): Any? {
         if (this === otherNode) {
             intersectionSizeRef += buffer.size
             return NOVALUE
@@ -585,15 +585,15 @@ internal class TrieNode<E>(
         }
     }
 
-    fun mutableRemoveAll(otherNode: TrieNode<E>, shift: Int,
-                         intersectionSizeRef: DeltaCounter,
-                         mutator: PersistentHashSetBuilder<*>): Any? {
+    fun removeAll(otherNode: TrieNode<E>, shift: Int,
+                  intersectionSizeRef: DeltaCounter,
+                  mutator: PersistentHashSetBuilder<*>): Any? {
         if (this === otherNode) {
             intersectionSizeRef += calculateSize();
             return NOVALUE
         }
         if (shift > MAX_SHIFT) {
-            return mutableCollisionRemoveAll(otherNode, intersectionSizeRef, mutator.ownership)
+            return collisionRemoveAll(otherNode, intersectionSizeRef, mutator.ownership)
         }
         val removalBitmap = bitmap and otherNode.bitmap
         if (removalBitmap == 0) return this
@@ -614,7 +614,7 @@ internal class TrieNode<E>(
                     thisIsNode && otherIsNode -> @Suppress("UNCHECKED_CAST") {
                         thisCell as TrieNode<E>
                         otherNodeCell as TrieNode<E>
-                        thisCell.mutableRemoveAll(
+                        thisCell.removeAll(
                                 otherNodeCell,
                                 shift + LOG_MAX_BRANCHING_FACTOR,
                                 intersectionSizeRef,

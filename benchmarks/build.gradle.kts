@@ -64,9 +64,13 @@ benchmark {
             iterations = 7
             iterationTime = 500
             iterationTimeUnit = "ms"
-            param("size", "1", "10", "100", "1000", "10000")
-            param("immutablePercentage", /*"95", "30", */"0")
+            param("size", "1", "10", "100", "1000", "10000", "100000")
+            //param("immutablePercentage", /*"95", "30", */"0")
+            param("implementation", "hash")
             param("hashCodeType", "random", "collision")
+
+            include("immutableSet.RetainAll..*")
+            include("immutableSet.AddAll..*")
         }
 
         register("fast") {

@@ -12,7 +12,10 @@ import runBenchmarks
 
 fun main() {
     runBenchmarks(hashSetOutputFileName) { this
-            .include("immutableSet")
+            .include("immutableSet\\.RetainAll")
+            .include("immutableSet\\.RemoveAll")
+            .include("immutableSet\\.AddAll")
+            .include("immutableSet\\.ContainsAll")
             .exclude("builder")
             .param(implementationParam, "hash")
     }

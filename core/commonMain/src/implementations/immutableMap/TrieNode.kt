@@ -447,17 +447,17 @@ internal class TrieNode<K, V>(
         assert(otherNode.nodeMap == 0)
         assert(otherNode.dataMap == 0)
         val tempBuffer = this.buffer.copyOf(newSize = this.buffer.size + otherNode.buffer.size)
-        var i = this.buffer.size
-        for (j in 0 until otherNode.buffer.size step ENTRY_SIZE) {
+        var j = 0
+        for (i in this.buffer.size until tempBuffer.size step ENTRY_SIZE) {
             @Suppress("UNCHECKED_CAST")
             if (!this.collisionContainsKey(otherNode.buffer[j] as K)) {
                 tempBuffer[i] = otherNode.buffer[j]
                 tempBuffer[i + 1] = otherNode.buffer[j + 1]
-                i += ENTRY_SIZE
+                j += ENTRY_SIZE
             } else intersectionCounter.count++
         }
 
-        return when (val newSize = i) {
+        return when (val newSize = this.buffer.size + j) {
             this.buffer.size -> this
             otherNode.buffer.size -> otherNode
             tempBuffer.size -> TrieNode(0, 0, tempBuffer, owner)
