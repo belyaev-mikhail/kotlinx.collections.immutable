@@ -54,6 +54,118 @@ class ImmutableHashSetTest : ImmutableSetTestBase() {
         }
     }
 
+    @Test fun retainAllElements() {
+        run {
+            val left = immutableSetOf<Int>() + (1..2000)
+            compareSets(immutableSetOf(), left.retainAll(immutableSetOf()))
+            compareSets(immutableSetOf(), immutableSetOf<Int>().retainAll(left))
+        }
+
+        run {
+            val left = immutableSetOf<Int>() + (1..2000)
+            val right = immutableSetOf<Int>() + (2000..3000)
+            compareSets(immutableSetOf(2000), left intersect right)
+            compareSets(immutableSetOf(2000), right intersect left)
+        }
+
+        run {
+            val left = immutableSetOf<Int>() + (1..2000)
+            val right = immutableSetOf<Int>() + (2001..3000)
+            compareSets(immutableSetOf(), left intersect right)
+            compareSets(immutableSetOf(), right intersect left)
+        }
+
+        run {
+            val left = immutableSetOf<Int>() + (1..2000)
+            val right = immutableSetOf<Int>() + (200..3000)
+            compareSets(left.toSet() intersect right.toSet(), left intersect right)
+        }
+
+        run {
+            val left = immutableSetOf<IntWrapper>() + (1..2000).map { IntWrapper(it, it % 200) }
+            val right = immutableSetOf<IntWrapper>() + (200..3000).map { IntWrapper(it, it % 200) }
+            compareSets(left.toSet() intersect right.toSet(), left intersect right)
+        }
+
+        run {
+            val left = immutableSetOf<IntWrapper>() + (1..2000).map { IntWrapper(it, it % 200) }
+            val right = immutableSetOf<IntWrapper>() + (2001..3000).map { IntWrapper(it, it % 200) }
+            compareSets(left.toSet() intersect right.toSet(), left intersect right)
+        }
+
+        run {
+            val left = immutableSetOf<String>() + (1..2000).map { "$it" }
+            val right = immutableSetOf<String>() + (200..3000).map { "$it" }
+            compareSets(left.toSet() intersect right.toSet(), left intersect right)
+        }
+
+        run {
+            val left = immutableSetOf<Int>() + (1..2000)
+            assertSame(left, left intersect left)
+            val right = immutableSetOf<Int>() + (1..2000)
+            assertSame(right, right intersect left)
+            assertSame(left, left intersect right)
+        }
+    }
+
+    @Test fun removeAllElements() {
+        run {
+            val left = immutableSetOf<Int>() + (1..2000)
+            assertSame(left, left.removeAll(immutableSetOf()))
+            assertSame(immutableSetOf(), immutableSetOf<Int>().removeAll(left))
+        }
+
+        run {
+            val left = immutableSetOf<Int>() + (1..2000)
+            val right = immutableSetOf<Int>() + (2000..3000)
+            compareSets((1..1999).toSet(), left - right)
+            compareSets((2001..3000).toSet(), right - left)
+        }
+
+        run {
+            val left = immutableSetOf<Int>() + (1..2000)
+            val right = immutableSetOf<Int>() + (2001..3000)
+            assertSame(left, left - right)
+            assertSame(right, right - left)
+        }
+
+        run {
+            val left = immutableSetOf<Int>() + (1..2000)
+            val right = immutableSetOf<Int>() + (200..3000)
+            compareSets(left.toSet() - right.toSet(), left - right)
+            compareSets(right.toSet() - left.toSet(), right - left)
+        }
+
+        run {
+            val left = immutableSetOf<IntWrapper>() + (1..2000).map { IntWrapper(it, it % 200) }
+            val right = immutableSetOf<IntWrapper>() + (200..3000).map { IntWrapper(it, it % 200) }
+            compareSets(left.toSet() - right.toSet(), left - right)
+            compareSets(right.toSet() - left.toSet(), right - left)
+        }
+
+        run {
+            val left = immutableSetOf<IntWrapper>() + (1..2000).map { IntWrapper(it, it % 200) }
+            val right = immutableSetOf<IntWrapper>() + (2001..3000).map { IntWrapper(it, it % 200) }
+            compareSets(left.toSet() - right.toSet(), left - right)
+            compareSets(right.toSet() - left.toSet(), right - left)
+        }
+
+        run {
+            val left = immutableSetOf<String>() + (1..2000).map { "$it" }
+            val right = immutableSetOf<String>() + (200..3000).map { "$it" }
+            compareSets(left.toSet() - right.toSet(), left - right)
+            compareSets(right.toSet() - left.toSet(), right - left)
+        }
+
+        run {
+            val left = immutableSetOf<Int>() + (1..2000)
+            compareSets(immutableSetOf<Int>(), left - left)
+            val right = immutableSetOf<Int>() + (1..2000)
+            compareSets(immutableSetOf<Int>(), right - left)
+            compareSets(immutableSetOf<Int>(), left - right)
+        }
+    }
+
 }
 class ImmutableOrderedSetTest : ImmutableSetTestBase() {
     override fun <T> immutableSetOf(vararg elements: T) = persistentSetOf(*elements)
