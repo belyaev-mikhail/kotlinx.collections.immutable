@@ -72,7 +72,7 @@ benchmark {
             include("immutableSet.RetainAll..*")
             include("immutableSet.AddAll..*")
             include("immutableSet.RemoveAll..*")
-            include("imuutableSet.ContainsAll..*")
+            include("immutableSet.ContainsAll..*")
         }
 
         register("fast") {
