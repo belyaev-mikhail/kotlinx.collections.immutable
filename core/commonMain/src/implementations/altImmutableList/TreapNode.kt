@@ -38,12 +38,8 @@ internal class TreapNode<E>(
         val lefty = left?.removeAll(predicate)
         val righty = right?.removeAll(predicate)
         return when {
-            predicate(element) -> {
-                copy(left = lefty, right = righty)
-            }
-            else -> {
-                lefty + righty
-            }
+            predicate(element) -> copy(left = lefty, right = righty)
+            else -> lefty + righty
         }
     }
 
@@ -73,6 +69,16 @@ internal class TreapNode<E>(
                 righty.copy(rank = this.rank, left = left + righty.left)
             }
         }
+    }
+
+    private suspend fun SequenceScope<E>.walk(body: suspend SequenceScope<E>.(E) -> Unit) {
+        left?.let { walk(body) }
+        body(element)
+        right?.let { walk(body) }
+    }
+
+    operator fun iterator(): Iterator<E> = iterator {
+        walk { yield(it) }
     }
 }
 

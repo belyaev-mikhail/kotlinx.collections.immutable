@@ -9,6 +9,11 @@ import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.implementations.immutableList.AbstractPersistentList
 import kotlin.random.Random
 
+private object EmptyIterator: Iterator<Nothing> {
+    override fun hasNext(): Boolean = false
+    override fun next(): Nothing = throw NoSuchElementException()
+}
+
 class ImplicitKeyTreap<E> internal constructor(
         private val root: TreapNode<E>?,
         val randomSource: Random = Random.Default
@@ -77,6 +82,8 @@ class ImplicitKeyTreap<E> internal constructor(
         requireNotNull(root)
         return root.get(index)
     }
+
+    override fun iterator(): Iterator<E> = root?.iterator() ?: EmptyIterator
 
     companion object {
         val EMPTY: ImplicitKeyTreap<Nothing> = ImplicitKeyTreap(null)
