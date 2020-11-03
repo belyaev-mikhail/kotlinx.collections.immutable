@@ -72,7 +72,7 @@ class ImplicitKeyTreap<E> internal constructor(
     }
 
     override fun builder(): PersistentList.Builder<E> {
-        TODO("Not yet implemented")
+        return DefaultListBuilder(this)
     }
 
     override val size: Int
