@@ -11,14 +11,16 @@ import kotlin.random.Random
 internal val <E> TreapNode<E>?.size: Int get() = this?.size ?: 0
 internal val <E> TreapNode<E>?.rank: Int get() = this?.rank ?: 0
 
-internal class TreapNode<E>(
-        val left: TreapNode<E>?,
-        val element: E,
-        val right: TreapNode<E>?,
-        val rank: Int
-) {
+internal class TreapNode<E>(val left: TreapNode<E>?, val element: E, val right: TreapNode<E>?, val rank: Int) {
+
     constructor(left: TreapNode<E>?, element: E, right: TreapNode<E>?, randomSource: Random) :
             this(left, element, right, randomSource.nextInt())
+
+    data class Builder<E>(
+            var left: TreapNode<E>? = null,
+            var right: TreapNode<E>? = null,
+            var element: E? = null
+    )
 
     internal fun copy(
             left: TreapNode<E>? = this.left,
@@ -53,20 +55,25 @@ internal class TreapNode<E>(
         }
     }
 
-    fun splitAt(index: Int): TreapNode<E> {
+    fun splitAt(index: Int, mutableNode: Builder<E> = Builder()): Builder<E> {
         ListImplementation.checkElementIndex(index, size)
         return when {
-            index == centerIndex -> this
+            index == centerIndex -> {
+                mutableNode.left = left
+                mutableNode.right = right
+                mutableNode.element = element
+                mutableNode
+            }
             index < centerIndex -> {
-                requireNotNull(left)
-                val lefty = left.splitAt(index)
-                lefty.copy(rank = this.rank, right = lefty.right + right)
+                val lefty = requireNotNull(left).splitAt(index, mutableNode)
+                lefty.right = lefty.right + right
+                lefty
             }
             /* index > centerIndex */
             else -> {
-                requireNotNull(right)
-                val righty = right.splitAt(index - centerIndex)
-                righty.copy(rank = this.rank, left = left + righty.left)
+                val righty = requireNotNull(right).splitAt(index - centerIndex, mutableNode)
+                righty.left = left + righty.left
+                righty
             }
         }
     }

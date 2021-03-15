@@ -41,6 +41,7 @@ class ImplicitKeyTreap<E> internal constructor(
         if (size == 0 && index == 0) return ImplicitKeyTreap(TreapNode(element))
         requireNotNull(root)
         val (l, r, e) = root.splitAt(index)
+        checkNotNull(e)
         return copy(l + TreapNode(element) + TreapNode(e) + r)
     }
 
@@ -59,6 +60,7 @@ class ImplicitKeyTreap<E> internal constructor(
                 if (index == 0 && size == 0) return c
                 requireNotNull(root)
                 val (l, r, e) = root.splitAt(index)
+                checkNotNull(e)
                 copy(l + c.root + TreapNode(e) + r)
             }
             else -> super.addAll(index, c)
@@ -86,7 +88,10 @@ class ImplicitKeyTreap<E> internal constructor(
     override fun iterator(): Iterator<E> = root?.iterator() ?: EmptyIterator
 
     companion object {
-        val EMPTY: ImplicitKeyTreap<Nothing> = ImplicitKeyTreap(null)
+        private val EMPTY: ImplicitKeyTreap<Nothing> = ImplicitKeyTreap(null)
+
+        fun <E> emptyOf(): ImplicitKeyTreap<E> =
+                @Suppress("UNCHECKED_CAST") (EMPTY as ImplicitKeyTreap<E>)
     }
 
 }
