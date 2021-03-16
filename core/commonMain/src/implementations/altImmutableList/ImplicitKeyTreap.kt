@@ -34,7 +34,7 @@ class ImplicitKeyTreap<E> internal constructor(
 
     override fun set(index: Int, element: E): PersistentList<E> {
         ListImplementation.checkElementIndex(index, size)
-        requireNotNull(root)
+        checkNotNull(root)
         val (l, r, _) = root.splitAt(index)
         return copy(l + TreapNode(element) + r)
     }
@@ -42,7 +42,7 @@ class ImplicitKeyTreap<E> internal constructor(
     override fun add(index: Int, element: E): ImplicitKeyTreap<E> {
         ListImplementation.checkPositionIndex(index, size)
         if (size == 0 && index == 0) return ImplicitKeyTreap(TreapNode(element))
-        requireNotNull(root)
+        checkNotNull(root)
         val (l, r, e) = root.splitAt(index)
         checkNotNull(e)
         return copy(l + TreapNode(element) + TreapNode(e) + r)
@@ -62,7 +62,7 @@ class ImplicitKeyTreap<E> internal constructor(
     }
 
     override fun addAll(index: Int, c: Collection<E>): ImplicitKeyTreap<E> {
-        ListImplementation.checkElementIndex(index, size)
+        ListImplementation.checkPositionIndex(index, size)
         if (index == size) return addAll(c)
         return when (c) {
             is ImplicitKeyTreap -> {
