@@ -46,17 +46,15 @@ internal class TreapNode<E>(val left: TreapNode<E>?, val element: E, val right: 
     }
 
     fun get(index: Int): E {
-        ListImplementation.checkElementIndex(index, size)
         return when {
             index == centerIndex -> element
-            index < centerIndex -> left?.get(index) ?: throw IndexOutOfBoundsException()
+            index < centerIndex -> checkNotNull(left).get(index)
             /* index > centerIndex */
-            else -> right?.get(centerIndex + index) ?: throw IndexOutOfBoundsException()
+            else -> checkNotNull(right).get(index - centerIndex - 1)
         }
     }
 
     fun splitAt(index: Int, mutableNode: Builder<E> = Builder()): Builder<E> {
-        ListImplementation.checkElementIndex(index, size)
         return when {
             index == centerIndex -> {
                 mutableNode.left = left
@@ -65,23 +63,23 @@ internal class TreapNode<E>(val left: TreapNode<E>?, val element: E, val right: 
                 mutableNode
             }
             index < centerIndex -> {
-                val lefty = requireNotNull(left).splitAt(index, mutableNode)
-                lefty.right = lefty.right + right
+                val lefty = checkNotNull(left).splitAt(index, mutableNode)
+                lefty.right = copy(left = lefty.right)
                 lefty
             }
             /* index > centerIndex */
             else -> {
-                val righty = requireNotNull(right).splitAt(index - centerIndex, mutableNode)
-                righty.left = left + righty.left
+                val righty = checkNotNull(right).splitAt(index - centerIndex - 1, mutableNode)
+                righty.left = copy(right = righty.left)
                 righty
             }
         }
     }
 
     private suspend fun SequenceScope<E>.walk(body: suspend SequenceScope<E>.(E) -> Unit) {
-        left?.let { walk(body) }
+        left?.apply { walk(body) }
         body(element)
-        right?.let { walk(body) }
+        right?.apply { walk(body) }
     }
 
     operator fun iterator(): Iterator<E> = iterator {
@@ -91,7 +89,7 @@ internal class TreapNode<E>(val left: TreapNode<E>?, val element: E, val right: 
 
 internal operator fun <E> TreapNode<E>?.plus(that: TreapNode<E>?): TreapNode<E>? {
     if (this === null) return that
-    if (that === null) return right
+    if (that === null) return this
 
     return when {
         this.rank > that.rank -> this.copy(left = this.left, right = this.right + that)

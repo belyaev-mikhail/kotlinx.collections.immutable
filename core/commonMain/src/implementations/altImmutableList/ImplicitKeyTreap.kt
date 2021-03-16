@@ -7,6 +7,7 @@ package kotlinx.collections.immutable.implementations.altImmutableList
 
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.implementations.immutableList.AbstractPersistentList
+import kotlinx.collections.immutable.internal.ListImplementation
 import kotlin.random.Random
 
 private object EmptyIterator: Iterator<Nothing> {
@@ -24,7 +25,7 @@ class ImplicitKeyTreap<E> internal constructor(
     internal fun TreapNode(value: E, left: TreapNode<E>? = null, right: TreapNode<E>? = null) =
             TreapNode(left, value, right, randomSource)
 
-    override fun add(element: E): PersistentList<E> =
+    override fun add(element: E): ImplicitKeyTreap<E> =
             copy(root + TreapNode(element))
 
     override fun removeAll(predicate: (E) -> Boolean): PersistentList<E> {
@@ -32,12 +33,14 @@ class ImplicitKeyTreap<E> internal constructor(
     }
 
     override fun set(index: Int, element: E): PersistentList<E> {
+        ListImplementation.checkElementIndex(index, size)
         requireNotNull(root)
         val (l, r, _) = root.splitAt(index)
         return copy(l + TreapNode(element) + r)
     }
 
-    override fun add(index: Int, element: E): PersistentList<E> {
+    override fun add(index: Int, element: E): ImplicitKeyTreap<E> {
+        ListImplementation.checkPositionIndex(index, size)
         if (size == 0 && index == 0) return ImplicitKeyTreap(TreapNode(element))
         requireNotNull(root)
         val (l, r, e) = root.splitAt(index)
@@ -45,16 +48,22 @@ class ImplicitKeyTreap<E> internal constructor(
         return copy(l + TreapNode(element) + TreapNode(e) + r)
     }
 
-    override fun addAll(elements: Collection<E>): PersistentList<E> {
+    override fun addAll(elements: Collection<E>): ImplicitKeyTreap<E> {
         return when (elements) {
             is ImplicitKeyTreap -> {
                 copy(root + elements.root)
             }
-            else -> super.addAll(elements)
+            else -> {
+                var result = this
+                for (e in elements) result = result.add(e)
+                result
+            }
         }
     }
 
-    override fun addAll(index: Int, c: Collection<E>): PersistentList<E> {
+    override fun addAll(index: Int, c: Collection<E>): ImplicitKeyTreap<E> {
+        ListImplementation.checkElementIndex(index, size)
+        if (index == size) return addAll(c)
         return when (c) {
             is ImplicitKeyTreap -> {
                 if (index == 0 && size == 0) return c
@@ -63,11 +72,19 @@ class ImplicitKeyTreap<E> internal constructor(
                 checkNotNull(e)
                 copy(l + c.root + TreapNode(e) + r)
             }
-            else -> super.addAll(index, c)
+            else -> {
+                requireNotNull(root)
+                val (l, r, e) = root.splitAt(index)
+                checkNotNull(e)
+                var left = l
+                for (adding in c) left += TreapNode(adding)
+                copy(left + TreapNode(e) + r)
+            }
         }
     }
 
     override fun removeAt(index: Int): PersistentList<E> {
+        ListImplementation.checkElementIndex(index, size)
         requireNotNull(root)
         val (l, r, _) = root.splitAt(index)
         return copy(l + r)
@@ -81,7 +98,8 @@ class ImplicitKeyTreap<E> internal constructor(
         get() = root.size
 
     override fun get(index: Int): E {
-        requireNotNull(root)
+        ListImplementation.checkElementIndex(index, size)
+        root!!
         return root.get(index)
     }
 

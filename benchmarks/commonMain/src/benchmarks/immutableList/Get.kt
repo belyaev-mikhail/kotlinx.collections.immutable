@@ -15,11 +15,14 @@ open class Get {
     @Param(BM_1, BM_10, BM_100, BM_1000, BM_10000, BM_100000, BM_1000000, BM_10000000)
     var size: Int = 0
 
+    @Param(AMT_IMPL, TREAP_IMPL)
+    var implementation: String = ""
+
     private var persistentList: PersistentList<String> = persistentListOf()
 
     @Setup
     fun prepare() {
-        persistentList = persistentListAdd(size)
+        persistentList = persistentListAdd(implementation, size)
     }
 
     @Benchmark

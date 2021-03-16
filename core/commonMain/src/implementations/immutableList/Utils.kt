@@ -14,7 +14,7 @@ internal const val MUTABLE_BUFFER_SIZE = MAX_BUFFER_SIZE + 1
 
 internal class ObjectRef(var value: Any?)
 
-internal fun <E> persistentVectorOf(): PersistentList<E> {
+fun <E> persistentVectorOf(): PersistentList<E> {
     return SmallPersistentVector.EMPTY
 }
 

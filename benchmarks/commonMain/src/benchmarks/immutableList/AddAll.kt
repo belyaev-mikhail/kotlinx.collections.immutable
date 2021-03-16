@@ -15,11 +15,14 @@ open class AddAll {
     @Param(BM_1, BM_10, BM_100, BM_1000, BM_10000, BM_100000, BM_1000000, BM_10000000)
     var size: Int = 0
 
-    private var listToAdd = emptyList<String>()
+    @Param(AMT_IMPL, TREAP_IMPL)
+    var implementation: String = ""
+
+    private var listToAdd = persistentListAdd(implementation, 0)
 
     @Setup
     fun prepare() {
-        listToAdd = List(size) { "another element" }
+        listToAdd = persistentListAdd(implementation, size)
     }
 
     // Results of the following benchmarks do not indicate memory or time spent per operation,
@@ -35,7 +38,7 @@ open class AddAll {
      */
     @Benchmark
     fun addAllLast(): ImmutableList<String> {
-        return persistentListOf<String>().addAll(listToAdd)
+        return persistentListAdd(implementation, 0).addAll(listToAdd)
     }
 
     /**
@@ -46,7 +49,7 @@ open class AddAll {
     fun addAllLast_Half(): ImmutableList<String> {
         val initialSize = size / 2
         val subListToAdd = listToAdd.subList(0, size - initialSize) // assuming subList creation is neglectable
-        return persistentListAdd(initialSize).addAll(subListToAdd)
+        return persistentListAdd(implementation, initialSize).addAll(subListToAdd)
     }
 
     /**
@@ -57,7 +60,7 @@ open class AddAll {
     fun addAllLast_OneThird(): ImmutableList<String> {
         val initialSize = size - size / 3
         val subListToAdd = listToAdd.subList(0, size - initialSize)
-        return persistentListAdd(initialSize).addAll(subListToAdd)
+        return persistentListAdd(implementation, initialSize).addAll(subListToAdd)
     }
 
     /**
@@ -68,7 +71,7 @@ open class AddAll {
     fun addAllFirst_Half(): ImmutableList<String> {
         val initialSize = size / 2
         val subListToAdd = listToAdd.subList(0, size - initialSize)
-        return persistentListAdd(initialSize).addAll(0, subListToAdd)
+        return persistentListAdd(implementation, initialSize).addAll(0, subListToAdd)
     }
 
     /**
@@ -79,7 +82,7 @@ open class AddAll {
     fun addAllFirst_OneThird(): ImmutableList<String> {
         val initialSize = size - size / 3
         val subListToAdd = listToAdd.subList(0, size - initialSize)
-        return persistentListAdd(initialSize).addAll(0, subListToAdd)
+        return persistentListAdd(implementation, initialSize).addAll(0, subListToAdd)
     }
 
     /**
@@ -91,7 +94,7 @@ open class AddAll {
         val initialSize = size / 2
         val index = initialSize / 2
         val subListToAdd = listToAdd.subList(0, size - initialSize)
-        return persistentListAdd(initialSize).addAll(index, subListToAdd)
+        return persistentListAdd(implementation, initialSize).addAll(index, subListToAdd)
     }
 
     /**
@@ -103,6 +106,6 @@ open class AddAll {
         val initialSize = size - size / 3
         val index = initialSize / 2
         val subListToAdd = listToAdd.subList(0, size - initialSize)
-        return persistentListAdd(initialSize).addAll(index, subListToAdd)
+        return persistentListAdd(implementation, initialSize).addAll(index, subListToAdd)
     }
 }

@@ -14,14 +14,17 @@ open class Add {
     @Param(BM_1, BM_10, BM_100, BM_1000, BM_10000, BM_100000, BM_1000000, BM_10000000)
     var size: Int = 0
 
+    @Param(AMT_IMPL, TREAP_IMPL)
+    var implementation: String = ""
+
     @Benchmark
     fun addLast(): ImmutableList<String> {
-        return persistentListAdd(size)
+        return persistentListAdd(implementation, size)
     }
 
     @Benchmark
     fun addLastAndIterate(bh: Blackhole) {
-        val list = persistentListAdd(size)
+        val list = persistentListAdd(implementation, size)
         for (e in list) {
             bh.consume(e)
         }
@@ -29,7 +32,7 @@ open class Add {
 
     @Benchmark
     fun addLastAndGet(bh: Blackhole) {
-        val list = persistentListAdd(size)
+        val list = persistentListAdd(implementation, size)
         for (i in 0 until list.size) {
             bh.consume(list[i])
         }
@@ -46,7 +49,7 @@ open class Add {
      */
     @Benchmark
     fun addFirst(): ImmutableList<String> {
-        return persistentListAdd(size - 1).add(0, "another element")
+        return persistentListAdd(implementation, size - 1).add(0, "another element")
     }
 
     /**
@@ -60,6 +63,6 @@ open class Add {
      */
     @Benchmark
     fun addMiddle(): ImmutableList<String> {
-        return persistentListAdd(size - 1).add(size / 2, "another element")
+        return persistentListAdd(implementation, size - 1).add(size / 2, "another element")
     }
 }

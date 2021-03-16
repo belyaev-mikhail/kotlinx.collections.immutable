@@ -5,13 +5,14 @@
 
 package benchmarks.immutableList.builder
 
+import benchmarks.AMT_IMPL
 import kotlinx.collections.immutable.PersistentList
 import benchmarks.immutableList.persistentListAdd
 import benchmarks.immutableSize
 
 fun persistentListBuilderAdd(size: Int, immutablePercentage: Double): PersistentList.Builder<String> {
     val immutableSize = immutableSize(size, immutablePercentage)
-    val builder = persistentListAdd(immutableSize).builder()
+    val builder = persistentListAdd(AMT_IMPL, immutableSize).builder()
     repeat(times = size - immutableSize) {
         builder.add("some element")
     }

@@ -5,13 +5,25 @@
 
 package benchmarks.immutableList
 
+import benchmarks.AMT_IMPL
+import benchmarks.TREAP_IMPL
 import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.implementations.altImmutableList.ImplicitKeyTreap
+import kotlinx.collections.immutable.implementations.immutableList.persistentVectorOf
 import kotlinx.collections.immutable.persistentListOf
 
-fun persistentListAdd(size: Int): PersistentList<String> {
-    var list = persistentListOf<String>()
+fun persistentListAdd(implementation: String, size: Int): PersistentList<String> {
+    var list: PersistentList<String> = emptyPersistentList(implementation)
     repeat(times = size) {
         list = list.add("some element")
     }
     return list
+}
+
+fun <E> emptyPersistentList(implementation: String): PersistentList<E> {
+    return when (implementation) {
+        AMT_IMPL -> persistentVectorOf()
+        TREAP_IMPL -> ImplicitKeyTreap.emptyOf()
+        else -> TODO()
+    }
 }
