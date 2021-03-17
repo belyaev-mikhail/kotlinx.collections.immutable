@@ -18,7 +18,7 @@ open class AddAll {
     @Param(AMT_IMPL, TREAP_IMPL)
     var implementation: String = ""
 
-    private var listToAdd = persistentListAdd(implementation, 0)
+    private var listToAdd = persistentListOf<String>()
 
     @Setup
     fun prepare() {

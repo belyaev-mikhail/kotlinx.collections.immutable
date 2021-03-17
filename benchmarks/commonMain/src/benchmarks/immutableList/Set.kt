@@ -19,7 +19,7 @@ open class Set {
     @Param(AMT_IMPL, TREAP_IMPL)
     var implementation: String = ""
 
-    private var persistentList: PersistentList<String> = emptyPersistentList(implementation)
+    private var persistentList: PersistentList<String> = persistentListOf()
     private var randomIndices = listOf<Int>()
 
     @Setup
