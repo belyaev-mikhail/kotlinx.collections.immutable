@@ -30,17 +30,19 @@ open class Set {
 
     @Benchmark
     fun setByIndex(): ImmutableList<String> {
+        var list = persistentList
         repeat(times = size) { index ->
-            persistentList = persistentList.set(index, "another element")
+            list = list.set(index, "another element")
         }
-        return persistentList
+        return list
     }
 
     @Benchmark
     fun setByRandomIndex(): ImmutableList<String> {
+        var list = persistentList
         repeat(times = size) { index ->
-            persistentList = persistentList.set(randomIndices[index], "another element")
+            list = list.set(randomIndices[index], "another element")
         }
-        return persistentList
+        return list
     }
 }

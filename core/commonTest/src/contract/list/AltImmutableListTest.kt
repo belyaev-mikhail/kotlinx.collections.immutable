@@ -19,6 +19,11 @@ fun <E> altPersistentListOf(vararg elements: E): PersistentList<E> {
     return result
 }
 
+fun <T> ImmutableList<T>.toAltPersistentList(): PersistentList<T> {
+    if (this is ImplicitKeyTreap) return this
+    else return altPersistentListOf<T>().addAll(this)
+}
+
 class AltImmutableListTest {
 
     private fun <T> compareLists(expected: List<T>, actual: List<T>) = compare(expected, actual) { listBehavior() }
@@ -76,7 +81,7 @@ class AltImmutableListTest {
     }
 
     @Test fun replaceElements() {
-        var list = "abcxaxab12".toImmutableList().toPersistentList()
+        var list = "abcxaxab12".toImmutableList().toAltPersistentList()
 
         for (i in list.indices) {
             list = list.set(i, list[i] as Char + i)
@@ -88,7 +93,7 @@ class AltImmutableListTest {
     }
 
     @Test fun removeElements() {
-        val list = "abcxaxyz12".toImmutableList().toPersistentList()
+        val list = "abcxaxyz12".toImmutableList().toAltPersistentList()
         fun expectList(content: String, list: ImmutableList<Char>) {
             compareLists(content.toList(), list)
         }
@@ -113,7 +118,7 @@ class AltImmutableListTest {
     }
 
     @Test fun subList() {
-        val list = "abcxaxyz12".toImmutableList()
+        val list = "abcxaxyz12".toImmutableList().toAltPersistentList()
         val subList = list.subList(2, 5) // 2, 3, 4
         assertTrue(subList is ImmutableList)
         compareLists(listOf('c', 'x', 'a'), subList)
@@ -149,7 +154,7 @@ class AltImmutableListTest {
     }
 
     @Test fun subListOfBuilder() {
-        val list = "abcxaxyz12".toImmutableList().toPersistentList()
+        val list = "abcxaxyz12".toPersistentList()
         val builder = list.builder()
 
         // builder needs to recreate the inner trie to apply the modification.
@@ -185,7 +190,7 @@ class AltImmutableListTest {
     @Test fun noOperation() {
         persistentListOf<Int>().testNoOperation({ clear() }, { clear() })
 
-        val list = "abcxaxyz12".toPersistentList()
+        val list = "abcxaxyz12".toPersistentList().toAltPersistentList()
         with(list) {
             testNoOperation({ remove('d') }, { remove('d') })
             testNoOperation({ removeAll(listOf('d', 'e')) }, { removeAll(listOf('d', 'e')) })

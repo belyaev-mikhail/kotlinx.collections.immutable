@@ -11,6 +11,16 @@ import kotlin.random.Random
 internal val <E> TreapNode<E>?.size: Int get() = this?.size ?: 0
 internal val <E> TreapNode<E>?.rank: Int get() = this?.rank ?: 0
 
+internal tailrec fun <E> TreapNode<E>.getByIndex(index: Int): E {
+    val centerIndex = left.size
+    return when {
+        index == centerIndex -> element
+        index < centerIndex -> checkNotNull(left).getByIndex(index)
+        /* index > centerIndex */
+        else -> checkNotNull(right).getByIndex(index - centerIndex - 1)
+    }
+}
+
 internal class TreapNode<E>(val left: TreapNode<E>?, val element: E, val right: TreapNode<E>?, val rank: Int) {
 
     constructor(left: TreapNode<E>?, element: E, right: TreapNode<E>?, randomSource: Random) :
@@ -40,19 +50,13 @@ internal class TreapNode<E>(val left: TreapNode<E>?, val element: E, val right: 
         val lefty = left?.removeAll(predicate)
         val righty = right?.removeAll(predicate)
         return when {
-            predicate(element) -> copy(left = lefty, right = righty)
-            else -> lefty + righty
+            predicate(element) -> lefty + righty
+            lefty === left && righty === right -> this
+            else -> copy(left = lefty, right = righty)
         }
     }
 
-    fun get(index: Int): E {
-        return when {
-            index == centerIndex -> element
-            index < centerIndex -> checkNotNull(left).get(index)
-            /* index > centerIndex */
-            else -> checkNotNull(right).get(index - centerIndex - 1)
-        }
-    }
+    fun get(index: Int): E = getByIndex(index)
 
     fun splitAt(index: Int, mutableNode: Builder<E> = Builder()): Builder<E> {
         return when {

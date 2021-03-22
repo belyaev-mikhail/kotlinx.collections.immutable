@@ -10,33 +10,39 @@ import kotlinx.collections.immutable.implementations.immutableList.AbstractPersi
 import kotlinx.collections.immutable.internal.ListImplementation
 import kotlin.random.Random
 
-private object EmptyIterator: Iterator<Nothing> {
+private object EmptyIterator: ListIterator<Nothing> {
     override fun hasNext(): Boolean = false
     override fun next(): Nothing = throw NoSuchElementException()
+    override fun hasPrevious(): Boolean = false
+    override fun nextIndex(): Int = 0
+    override fun previous(): Nothing = throw NoSuchElementException()
+    override fun previousIndex(): Int = -1
 }
 
 class ImplicitKeyTreap<E> internal constructor(
         private val root: TreapNode<E>?,
         val randomSource: Random = Random.Default
 ): AbstractPersistentList<E>() {
-    internal fun copy(root: TreapNode<E>? = this.root, randomSource: Random = this.randomSource) =
-            ImplicitKeyTreap(root, randomSource)
+    internal fun copyOrSelf(root: TreapNode<E>? = this.root, randomSource: Random = this.randomSource) =
+        when {
+            root === this.root && randomSource === this.randomSource -> this
+            else -> ImplicitKeyTreap(root, randomSource)
+        }
 
     internal fun TreapNode(value: E, left: TreapNode<E>? = null, right: TreapNode<E>? = null) =
             TreapNode(left, value, right, randomSource)
 
     override fun add(element: E): ImplicitKeyTreap<E> =
-            copy(root + TreapNode(element))
+            copyOrSelf(root + TreapNode(element))
 
-    override fun removeAll(predicate: (E) -> Boolean): PersistentList<E> {
-        return copy(root?.removeAll(predicate))
-    }
+    override fun removeAll(predicate: (E) -> Boolean): PersistentList<E> =
+            copyOrSelf(root?.removeAll(predicate))
 
     override fun set(index: Int, element: E): PersistentList<E> {
         ListImplementation.checkElementIndex(index, size)
         checkNotNull(root)
         val (l, r, _) = root.splitAt(index)
-        return copy(l + TreapNode(element) + r)
+        return copyOrSelf(l + TreapNode(element) + r)
     }
 
     override fun add(index: Int, element: E): ImplicitKeyTreap<E> {
@@ -45,13 +51,13 @@ class ImplicitKeyTreap<E> internal constructor(
         checkNotNull(root)
         val (l, r, e) = root.splitAt(index)
         checkNotNull(e)
-        return copy(l + TreapNode(element) + TreapNode(e) + r)
+        return copyOrSelf(l + TreapNode(element) + TreapNode(e) + r)
     }
 
     override fun addAll(elements: Collection<E>): ImplicitKeyTreap<E> {
         return when (elements) {
             is ImplicitKeyTreap -> {
-                copy(root + elements.root)
+                copyOrSelf(root + elements.root)
             }
             else -> {
                 var result = this
@@ -70,7 +76,7 @@ class ImplicitKeyTreap<E> internal constructor(
                 requireNotNull(root)
                 val (l, r, e) = root.splitAt(index)
                 checkNotNull(e)
-                copy(l + c.root + TreapNode(e) + r)
+                copyOrSelf(l + c.root + TreapNode(e) + r)
             }
             else -> {
                 requireNotNull(root)
@@ -78,7 +84,7 @@ class ImplicitKeyTreap<E> internal constructor(
                 checkNotNull(e)
                 var left = l
                 for (adding in c) left += TreapNode(adding)
-                copy(left + TreapNode(e) + r)
+                copyOrSelf(left + TreapNode(e) + r)
             }
         }
     }
@@ -87,7 +93,7 @@ class ImplicitKeyTreap<E> internal constructor(
         ListImplementation.checkElementIndex(index, size)
         requireNotNull(root)
         val (l, r, _) = root.splitAt(index)
-        return copy(l + r)
+        return copyOrSelf(l + r)
     }
 
     override fun builder(): PersistentList.Builder<E> {
@@ -103,8 +109,18 @@ class ImplicitKeyTreap<E> internal constructor(
         return root.get(index)
     }
 
-    override fun iterator(): Iterator<E> = root?.iterator() ?: EmptyIterator
+    //override fun iterator(): Iterator<E> = root?.iterator() ?: EmptyIterator
 
+    override fun iterator(): Iterator<E> = listIterator()
+
+    override fun listIterator(): ListIterator<E> = listIterator(0)
+    override fun listIterator(index: Int): ListIterator<E> {
+        ListImplementation.checkPositionIndex(index, size)
+        return when(root) {
+            null -> EmptyIterator
+            else -> TreapNodeIterator(root, index, size)
+        }
+    }
     companion object {
         private val EMPTY: ImplicitKeyTreap<Nothing> = ImplicitKeyTreap(null)
 

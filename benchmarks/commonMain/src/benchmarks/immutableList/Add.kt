@@ -8,6 +8,7 @@ package benchmarks.immutableList
 import benchmarks.*
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.benchmark.*
+import kotlinx.collections.immutable.persistentListOf
 
 @State(Scope.Benchmark)
 open class Add {
@@ -16,6 +17,15 @@ open class Add {
 
     @Param(AMT_IMPL, TREAP_IMPL)
     var implementation: String = ""
+
+    var persistentList = persistentListOf<String>()
+    var toAdd: List<String> = listOf()
+
+    @Setup
+    fun prepare() {
+        persistentList = persistentListAdd(implementation, size)
+        toAdd = List(100) { "Element $it" }
+    }
 
     @Benchmark
     fun addLast(): ImmutableList<String> {
@@ -49,7 +59,11 @@ open class Add {
      */
     @Benchmark
     fun addFirst(): ImmutableList<String> {
-        return persistentListAdd(implementation, size - 1).add(0, "another element")
+        var list = persistentList
+        for (e in toAdd) {
+            list = list.add(0, e)
+        }
+        return list
     }
 
     /**
@@ -63,6 +77,10 @@ open class Add {
      */
     @Benchmark
     fun addMiddle(): ImmutableList<String> {
-        return persistentListAdd(implementation, size - 1).add(size / 2, "another element")
+        var list = persistentList
+        for (e in toAdd) {
+            list = list.add(size / 2, e)
+        }
+        return list
     }
 }

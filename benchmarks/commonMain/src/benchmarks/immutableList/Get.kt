@@ -19,15 +19,24 @@ open class Get {
     var implementation: String = ""
 
     private var persistentList: PersistentList<String> = persistentListOf()
+    private var randomIndices = listOf<Int>()
 
     @Setup
     fun prepare() {
         persistentList = persistentListAdd(implementation, size)
+        randomIndices = List(size) { it }.shuffled()
     }
 
     @Benchmark
     fun getByIndex(bh: Blackhole) {
         for (i in 0 until persistentList.size) {
+            bh.consume(persistentList[i])
+        }
+    }
+
+    @Benchmark
+    fun getByRandomIndex(bh: Blackhole) {
+        for (i in randomIndices) {
             bh.consume(persistentList[i])
         }
     }

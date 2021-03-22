@@ -19,10 +19,18 @@ open class AddAll {
     var implementation: String = ""
 
     private var listToAdd = persistentListOf<String>()
+    private var half = persistentListOf<String>()
+    private var otherHalf = persistentListOf<String>()
+    private var third = persistentListOf<String>()
+    private var twoThirds = persistentListOf<String>()
 
     @Setup
     fun prepare() {
         listToAdd = persistentListAdd(implementation, size)
+        half = persistentListAdd(implementation, size / 2)
+        otherHalf = persistentListAdd(implementation, size - size / 2)
+        third = persistentListAdd(implementation, size / 3)
+        twoThirds = persistentListAdd(implementation, size - size / 3)
     }
 
     // Results of the following benchmarks do not indicate memory or time spent per operation,
@@ -47,9 +55,7 @@ open class AddAll {
      */
     @Benchmark
     fun addAllLast_Half(): ImmutableList<String> {
-        val initialSize = size / 2
-        val subListToAdd = listToAdd.subList(0, size - initialSize) // assuming subList creation is neglectable
-        return persistentListAdd(implementation, initialSize).addAll(subListToAdd)
+        return half.addAll(otherHalf)
     }
 
     /**
@@ -58,9 +64,7 @@ open class AddAll {
      */
     @Benchmark
     fun addAllLast_OneThird(): ImmutableList<String> {
-        val initialSize = size - size / 3
-        val subListToAdd = listToAdd.subList(0, size - initialSize)
-        return persistentListAdd(implementation, initialSize).addAll(subListToAdd)
+        return twoThirds.addAll(third)
     }
 
     /**
@@ -69,9 +73,7 @@ open class AddAll {
      */
     @Benchmark
     fun addAllFirst_Half(): ImmutableList<String> {
-        val initialSize = size / 2
-        val subListToAdd = listToAdd.subList(0, size - initialSize)
-        return persistentListAdd(implementation, initialSize).addAll(0, subListToAdd)
+        return half.addAll(0, otherHalf)
     }
 
     /**
@@ -80,9 +82,7 @@ open class AddAll {
      */
     @Benchmark
     fun addAllFirst_OneThird(): ImmutableList<String> {
-        val initialSize = size - size / 3
-        val subListToAdd = listToAdd.subList(0, size - initialSize)
-        return persistentListAdd(implementation, initialSize).addAll(0, subListToAdd)
+        return twoThirds.addAll(0, third)
     }
 
     /**
@@ -91,10 +91,7 @@ open class AddAll {
      */
     @Benchmark
     fun addAllMiddle_Half(): ImmutableList<String> {
-        val initialSize = size / 2
-        val index = initialSize / 2
-        val subListToAdd = listToAdd.subList(0, size - initialSize)
-        return persistentListAdd(implementation, initialSize).addAll(index, subListToAdd)
+        return half.addAll(half.size / 2, otherHalf)
     }
 
     /**
@@ -103,9 +100,6 @@ open class AddAll {
      */
     @Benchmark
     fun addAllMiddle_OneThird(): ImmutableList<String> {
-        val initialSize = size - size / 3
-        val index = initialSize / 2
-        val subListToAdd = listToAdd.subList(0, size - initialSize)
-        return persistentListAdd(implementation, initialSize).addAll(index, subListToAdd)
+        return twoThirds.addAll(twoThirds.size / 2, third)
     }
 }
