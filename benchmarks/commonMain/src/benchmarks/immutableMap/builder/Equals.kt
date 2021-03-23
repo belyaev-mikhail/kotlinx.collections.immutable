@@ -9,6 +9,8 @@ import benchmarks.*
 import kotlinx.benchmark.*
 import kotlinx.collections.immutable.persistentMapOf
 
+fun <K, V> obscureMap(map: Map<K, V>): Map<K, V> = object : Map<K, V> by map {}
+
 @State(Scope.Benchmark)
 open class Equals {
     @Param(BM_1, BM_10, BM_100, BM_1000, BM_10000, BM_100000, BM_1000000)
@@ -43,4 +45,10 @@ open class Equals {
     @Benchmark
     fun notEquals() = persistentMap == veryDifferentMap
 
+    @Benchmark
+    fun equalsTrueOld() = persistentMap == obscureMap(sameMap)
+    @Benchmark
+    fun nearlyEqualsOld() = persistentMap == obscureMap(slightlyDifferentMap)
+    @Benchmark
+    fun notEqualsOld() = persistentMap == obscureMap(veryDifferentMap)
 }

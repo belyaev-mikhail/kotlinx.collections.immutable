@@ -6,6 +6,7 @@
 package benchmarks.immutableMap
 
 import benchmarks.*
+import benchmarks.immutableMap.builder.obscureMap
 import kotlinx.benchmark.*
 import kotlinx.collections.immutable.persistentMapOf
 
@@ -40,4 +41,11 @@ open class Equals {
     fun nearlyEquals() = persistentMap == slightlyDifferentMap
     @Benchmark
     fun notEquals() = persistentMap == veryDifferentMap
+
+    @Benchmark
+    fun equalsTrueOld() = persistentMap == obscureMap(sameMap)
+    @Benchmark
+    fun nearlyEqualsOld() = persistentMap == obscureMap(slightlyDifferentMap)
+    @Benchmark
+    fun notEqualsOld() = persistentMap == obscureMap(veryDifferentMap)
 }

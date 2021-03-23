@@ -6,8 +6,11 @@
 package benchmarks.immutableSet
 
 import benchmarks.*
+import benchmarks.immutableMap.builder.obscureMap
 import kotlinx.benchmark.*
 import kotlinx.collections.immutable.persistentSetOf
+
+fun <T> obscureSet(set: Set<T>) = object: Set<T> by set {}
 
 @State(Scope.Benchmark)
 open class Equals {
@@ -40,4 +43,11 @@ open class Equals {
     fun nearlyEquals() = persistentSet == slightlyDifferentSet
     @Benchmark
     fun notEquals() = persistentSet == veryDifferentSet
+
+    @Benchmark
+    fun equalsTrueOld() = persistentSet == obscureSet(sameSet)
+    @Benchmark
+    fun nearlyEqualsOld() = persistentSet == obscureSet(slightlyDifferentSet)
+    @Benchmark
+    fun notEqualsOld() = persistentSet == obscureSet(veryDifferentSet)
 }
